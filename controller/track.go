@@ -30,6 +30,12 @@ func NewTrack(s store.TrackStore) *Track {
 			Path:    t.Prefix,
 			Handler: t.Create,
 		},
+		model.Route{
+			Name:    "All",
+			Method:  "GET",
+			Path:    t.Prefix,
+			Handler: t.GetAll,
+		},
 	}
 
 	t.Routes = append(t.Routes, routes...)
@@ -41,4 +47,12 @@ func (t Track) Create(w http.ResponseWriter, r *http.Request) {
 	track := &model.Track{}
 
 	utils.ParseJSON(r, track)
+	t.Store.Create(track)
+
+	utils.SendJSON(w, track, 201)
+}
+
+func (t Track) GetAll(w http.ResponseWriter, r *http.Request) {
+	data, _ := t.Store.All()
+	utils.SendJSON(w, data, 200)
 }
